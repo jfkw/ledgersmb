@@ -57,8 +57,8 @@ sub new {
 	if (!$self->{include_path}){
 		$self->{include_path} = $self->{'myconfig'}->{'templates'};
 		if (defined $self->{language}){
-			if (!$self->valid_language){
-				# TODO:  Throw errors or something.
+			if (!$self->_valid_language){
+				throw Error::Simple 'Invalid language';
 				return undef;
 			}
 			$self->{include_path} = "$self->{'include_path'}"
@@ -70,7 +70,7 @@ sub new {
 	return $self;
 }
 
-sub valid_language {
+sub _valid_language {
 	my $self = shift;
 	if ($self->{language} =~ m#(/|\\|:|\.\.|^\.)#){
 		return 0;
@@ -83,23 +83,12 @@ sub render {
 	my $vars = shift;
 	my $template;
 
-	if (not defined $self->{language}) {
-		$template = Template->new({
-			INCLUDE_PATH => $self->{'myconfig'}->{'templates'},
-			START_TAG => quotemeta('<?lsmb'),
-			END_TAG => quotemeta('?>'),
-			DELIMITER => ';',
-			}) || throw Error::Simple Template->error(); 
-	} elsif ($self->valid_language()) {
-		$template = Template->new({
-			INCLUDE_PATH => "$self->{'myconfig'}->{'templates'}/$self->{language};$self->{'myconfig'}->{'templates'}",
-			START_TAG => quotemeta('<?lsmb'),
-			END_TAG => quotemeta('?>'),
-			DELIMITER => ';',
-			}) || throw Error::Simple Template->error();
-	} else {
-		throw Error::Simple 'Invalid language';
-	}
+	$template = Template->new({
+		INCLUDE_PATH => $self->{include_path},
+		START_TAG => quotemeta('<?lsmb'),
+		END_TAG => quotemeta('?>'),
+		DELIMITER => ';',
+		}) || throw Error::Simple Template->error(); 
 
 	eval "require LedgerSMB::Template::$self->{format}";
 	if ($@) {
