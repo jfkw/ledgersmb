@@ -29,18 +29,38 @@ package LedgerSMB::Template;
 sub new {
 	my $class = shift;
 	my $self = {};
-	$self->{myconfig} = shift;
-	$self->{template} = shift;
-	$self->{format} = shift;
-	$self->{language} = shift;
+	my %args = @_;
+
+	$self->{myconfig} = $args{user};
+	$self->{template} = $args{template};
+	$self->{format} = $args{format};
+	$self->{language} = $args{language};
 	$self->{output} = '';
+	$self->{include_path} = $args{path};
+
 	bless $self, $class;
+
+	if (!$self->{include_path}){
+		$self->{include_path} = $self->{'myconfig'}->{'templates'};
+		if (defined $self->{language}){
+			if (!$self->valid_language){
+				# TODO:  Throw errors or something.
+				return undef;
+			}
+			$self->{include_path} = "$self->{'include_path'}"
+					."/$self->{language}"
+					.";$self->{'include_path'}"
+		}
+	}
+
 	return $self;
 }
 
 sub valid_language {
 	my $self = shift;
-	# XXX Actually perform validity checks
+	if ($self->{language} =~ m#(/|\\|:|\.\.|^\.)#){
+		return 0;
+	}
 	return 1;
 }
 
