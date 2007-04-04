@@ -1,25 +1,39 @@
-#=====================================================================
-#
-# Template support module for LedgerSMB
-# LedgerSMB::Template
-#
-# LedgerSMB 
-# Small Medium Business Accounting software
-# http://www.ledgersmb.org/
-# 
-#
-# Copyright (C) 2007
-# This work contains copyrighted information from a number of sources all used
-# with permission.  It is released under the GNU General Public License 
-# Version 2 or, at your option, any later version.  See COPYRIGHT file for 
-# details.
-#
-#
-#======================================================================
-# This package contains template related functions:
-#
-#
-#====================================================================
+=head1 NAME
+
+LedgerSMB::Template - Template support module for LedgerSMB 
+
+=head1 SYOPSIS
+
+This module renders templates to provide HTML interfaces.  LaTeX support
+forthcoming.
+
+=head1 METHODS
+
+=item new(user => \%myconfig, template => $string, format => 'HTML', [language => $string,] [include_path => $path]);
+
+	This command instantiates a new template:
+	template is the file name of the template to be processed.
+	format is the type of format to be used.  Currently only HTML is supported
+	language (optional) specifies the language for template selection.
+	include_path allows one to override the template directory and use this with user interface templates.
+
+=item render($hashref)
+
+This command renders the template and writes the result to standard output.  
+Currently email and server-side printing are not supported.
+
+=item my $bool = _valid_language()
+
+This command checks for valid langages.  Returns 1 if the language is valid, 
+0 if it is not.
+
+=head1 Copyright 2007, The LedgerSMB Core Team
+
+This file is licensed under the Gnu General Public License version 2, or at your
+option any later version.  A copy of the license should have been included with
+your software.
+
+=cut
 use Error qw(:try);
 use Template;
 use LedgerSMB::Sysconfig;
